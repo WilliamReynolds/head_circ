@@ -27,13 +27,17 @@ import numpy as np
 import os
 import sys
 import nipype
+import shutil
 
+# takes the input from the user and gets the abs path. 
 def setpath(argv):
     abs_path = os.path.abspath(os.path.join(os.getcwd(),argv))
     return abs_path
 
 path = setpath(sys.argv[1])
+print (path)
 
+# gets the image header info 
 def imagetoarray(img):
     img = nib.load(sys.argv[1])
     data = img.get_data()
@@ -53,4 +57,8 @@ def imagetoarray(img):
 
 imagetoarray(path)
 
-def 
+def copyimage(img):
+    newfile = os.path.abspath(os.path.join(os.getcwd(),"mask.nii.gz"))
+    shutil.copyfile(path,newfile)
+    nipype.interfaces.fslmaths.Threshold(newfile,)
+copyimage(path)
