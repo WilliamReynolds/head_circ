@@ -1,27 +1,3 @@
-"""
-to input center voxel and then make mask based on circumference.
-
-
-Gereral flow
-
-import img > numpy
-get voxel dimensions
-get center voxel
-find best estimate for head circ
-make new array of same size of 0
-
-for ijk in array do
-if sizedistance < circ: 
-    1
-    else
-    0
-
-make nibabl image from numpy array
-output file
-
-
-"""
-
 import nibabel as nib
 import numpy as np
 import os
@@ -65,4 +41,5 @@ def copyimage(img):
     threshold.thresh(100)
     threshold.in_file(newfile)
     threshold.run()
+
 copyimage(path)
