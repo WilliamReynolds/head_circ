@@ -25,7 +25,7 @@ try:
         return destination
 
     filename = sys.argv[1]
-    maskname = filename.split('.')[0]+'_mask.nii.gz'
+    maskname = filename.split('.')[0]+'_bmask.nii.gz'
     outPathFile = os.path.join(os.getcwd(),maskname)
 
     # gets the image header info 
@@ -49,23 +49,44 @@ try:
     yCenter = int(centerVoxel[1])
     zCenter = int(centerVoxel[2])
     
+    def MinMax(minMax, center, span, sign):
+        if (sign == '+'):
+            if (center + span) >= minMax:
+                return minMax
+            else:
+                return center + span
+        if (sign == '-'):
+            if (center - span <= minMax):
+                return minMax
+            else:
+                return center - span
 
     maskSize = int(input("\nEnter mask size\n"))
+    #get the span for region
     xSpan = math.ceil(maskSize/xDim)
-    xLower = xCenter
     ySpan = math.ceil(maskSize/yDim)
     zSpan = math.ceil(maskSize/zDim)
+    
+    # set upper and lower bounds
+    xUpper = MinMax(xMax, xCenter, xSpan, '+')
+    xLower = MinMax(0, xCenter, xSpan, '-')
+    yUpper = MinMax(yMax, yCenter, ySpan, '+')
+    yLower = MinMax(0, yCenter, ySpan, '-')
+    zUpper = MinMax(zMax, zCenter, zSpan, '+')
+    zLower = MinMax(0, zCenter, zSpan, '-')
+
+
 
     zFactor = zDim/xDim
 
 
     newArray = np.zeros((xMax, yMax, zMax))
 
-    for x in range(0, xMax):
+    for x in range(xLower, xUpper):
         xdiff = xDim * abs(xCenter - x)
-        for y in range(0, yMax):
+        for y in range(yLower, yUpper):
             ydiff = yDim * abs(yCenter - y)
-            for z in range(0, zMax):
+            for z in range(zLower, zUpper):
                 zdiff = zDim * abs(zCenter - z)
                 if (math.sqrt(xdiff**2 + ydiff**2 + zdiff**2)) < maskSize:
                     newArray[x,y,z] = 1
