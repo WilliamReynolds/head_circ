@@ -6,27 +6,44 @@ import nipype
 import nipype.interfaces.fsl
 import shutil
 import math
+'''
+1. get both functional file and mask file
+2. for xyzt in functional, check mask 
+    -0 then set to nan
+3. calculate avg over t dimension
+4. singular subject, need to create module/function to apply to batches
+5. Output results to histograms and compare distirbutions
+
+'''
+
+# takes the input from the user and gets the abs path. 
+def setpath(argv):
+    abs_path = os.path.abspath(os.path.join(os.getcwd(),argv))
+    return abs_path
+
+def copyfile():
+    destination = (os.getcwd() + '/mask.nii.gz')
+    print(path+" "+destination)
+    shutil.copyfile(path, destination)
+    return destination
+
+def MinMax(minMax, center, span, sign):
+    if (sign == '+'):
+        if (center + span) >= minMax:
+            return minMax
+        else:
+            return center + span
+    if (sign == '-'):
+        if (center - span <= minMax):
+            return minMax
+        else:
+            return center - span
 
 try: 
-
-
-    # takes the input from the user and gets the abs path. 
-    def setpath(argv):
-        abs_path = os.path.abspath(os.path.join(os.getcwd(),argv))
-        return abs_path
-
     path = setpath(sys.argv[1])
-    #print(path)
-
-    def copyfile():
-        destination = (os.getcwd() + '/mask.nii.gz')
-        print(path+" "+destination)
-        shutil.copyfile(path, destination)
-        return destination
-
     filename = sys.argv[1]
-    maskname = filename.split('.')[0]+'_bmask.nii.gz'
-    outPathFile = os.path.join(os.getcwd(),maskname)
+    maskname = sys.argv[2]
+    #outPathFile = os.path.join(os.getcwd(),maskname)
 
     # gets the image header info 
     img = nib.load(sys.argv[1])
@@ -43,60 +60,7 @@ try:
     print("\nxmax="+ str(xMax) + ", ymax=" + str(yMax) + " ,zmax=" + str(zMax))
     print("xDim="+ str(xDim) + ", ydim=" + str(yDim) + " ,zdim=" + str(zDim), end="\n\n")
 
-    # get the cente voxel to work from. 
-    center = input("Enter center voxel as 'x y z' seperated by a single space.\n")
-
-    centerVoxel = center.split(' ')
-    xCenter = int(centerVoxel[0])
-    yCenter = int(centerVoxel[1])
-    zCenter = int(centerVoxel[2])
     
-    def MinMax(minMax, center, span, sign):
-        if (sign == '+'):
-            if (center + span) >= minMax:
-                return minMax
-            else:
-                return center + span
-        if (sign == '-'):
-            if (center - span <= minMax):
-                return minMax
-            else:
-                return center - span
-
-    maskSize = int(input("\nEnter mask size\n"))
-    #get the span for region
-    xSpan = math.ceil(maskSize/xDim)
-    ySpan = math.ceil(maskSize/yDim)
-    zSpan = math.ceil(maskSize/zDim)
-    
-    # set upper and lower bounds
-    xUpper = MinMax(xMax, xCenter, xSpan, '+')
-    xLower = MinMax(0, xCenter, xSpan, '-')
-    yUpper = MinMax(yMax, yCenter, ySpan, '+')
-    yLower = MinMax(0, yCenter, ySpan, '-')
-    zUpper = MinMax(zMax, zCenter, zSpan, '+')
-    zLower = MinMax(0, zCenter, zSpan, '-')
-
-
-
-    zFactor = zDim/xDim
-
-
-    newArray = np.zeros((xMax, yMax, zMax))
-
-    for x in range(xLower, xUpper):
-        xdiff = xDim * abs(xCenter - x)
-        for y in range(yLower, yUpper):
-            ydiff = yDim * abs(yCenter - y)
-            for z in range(zLower, zUpper):
-                zdiff = zDim * abs(zCenter - z)
-                if (math.sqrt(xdiff**2 + ydiff**2 + zdiff**2)) < maskSize:
-                    newArray[x,y,z] = 1
-    affine = np.diag([1, 1, 1, 1])
-    arrayImg = nib.Nifti1Image(newArray, affine)
-    nib.save(arrayImg, outPathFile)
-
-
 
 
 
