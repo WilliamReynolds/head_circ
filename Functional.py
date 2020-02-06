@@ -57,10 +57,22 @@ try:
     zMax = (dimensions[2])
     tDim = np.around(pixDim[4],2)
     tMax = (dimensions[3])
-    print("\nxmax="+ str(xMax) + ", ymax=" + str(yMax) + " ,zmax=" + str(zMax))
-    print("xDim="+ str(xDim) + ", ydim=" + str(yDim) + " ,zdim=" + str(zDim), end="\n\n")
+    print(zMax)
+    print("\nxmax="+ str(xMax) + ", ymax=" + str(yMax) + ", zmax=" + str(zMax) +", tmax=" + str(tMax))
+    print("xDim="+ str(xDim) + ", ydim=" + str(yDim) + ", zdim=" + str(zDim) + ", tdim= " + str(zDim), end="\n\n")
 
-    
+    voxels=0
+    average=0
+    voxelList=[]
+    va = np.ndarray(((xMax, yMax, zMax, tMax)))
+    print(va.shape)
+
+   for i in range(0,xMax):
+       for j in range(0, xMax):
+           for k in range(0, zMax):
+               for t in range(0, tMax):
+                   #FIX THIS LINE va[i][j][k][t] = img
+
 
 
 
