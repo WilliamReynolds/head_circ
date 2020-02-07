@@ -25,6 +25,7 @@ try:
         return destination
 
     filename = sys.argv[1]
+    data = nb.load(filename)
     maskname = filename.split('.')[0]+'_bmask.nii.gz'
     outPathFile = os.path.join(os.getcwd(),maskname)
 
